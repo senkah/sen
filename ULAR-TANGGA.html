@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ular Tangga</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; }
+        canvas { border: 2px solid #000; background-color: #fff; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        #status { font-size: 18px; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Ular Tangga</h1>
+    <canvas id="board" width="500" height="500"></canvas>
+    <br>
+    <button id="rollDice">Lempar Dadu</button>
+    <p id="status">Klik "Lempar Dadu" untuk mulai!</p>
+
+    <script>
+        const canvas = document.getElementById('board');
+        const ctx = canvas.getContext('2d');
+        const rollBtn = document.getElementById('rollDice');
+        const status = document.getElementById('status');
+
+        const boardSize = 10;
+        const cellSize = canvas.width / boardSize;
+        let playerPos = 1; // Posisi pemain mulai dari 1
+        let aiPos = 1; // Posisi AI
+        let currentPlayer = 'player'; // 'player' atau 'ai'
+
+        // Definisi ular dan tangga (posisi awal -> akhir)
+        const snakes = { 16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 98: 78 };
+        const ladders = { 1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100 };
+
+        // Gambar papan
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < boardSize; i++) {
+                for (let j = 0; j < boardSize; j++) {
+                    const num = (i % 2 === 0) ? (i * boardSize + j + 1) : (i * boardSize + (boardSize - j));
+                    ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                    ctx.fillText(num, j * cellSize + cellSize / 2, i * cellSize + cellSize / 2);
+                }
+            }
+            // Gambar pemain (merah) dan AI (biru)
+            drawPlayer(playerPos, 'red');
+            drawPlayer(aiPos, 'blue');
+        }
+
+        function drawPlayer(pos, color) {
+            const row = Math.floor((pos - 1) / boardSize);
+            const col = (row % 2 === 0) ? (pos - 1) % boardSize : boardSize - 1 - ((pos - 1) % boardSize);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(col * cellSize + cellSize / 2, row * cellSize + cellSize / 2, 10, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        // Fungsi lempar dadu
+        function rollDice() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+
+        // Gerakkan pemain
+        function movePlayer(pos, steps) {
+            let newPos = pos + steps;
+            if (newPos > 100) newPos = 100; // Jangan melebihi 100
+            // Cek ular atau tangga
+            if (snakes[newPos]) newPos = snakes[newPos];
+            else if (ladders[newPos]) newPos = ladders[newPos];
+            return newPos;
+        }
+
+        // Event listener untuk tombol
+        rollBtn.addEventListener('click', () => {
+            if (currentPlayer === 'player') {
+                const dice = rollDice();
+                playerPos = movePlayer(playerPos, dice);
+                status.textContent = `Pemain melempar ${dice}, posisi sekarang: ${playerPos}`;
+                if (playerPos === 100) {
+                    status.textContent = 'Pemain menang!';
+                    rollBtn.disabled = true;
+                    return;
+                }
+                currentPlayer = 'ai';
+                setTimeout(() => {
+                    const aiDice = rollDice();
+                    aiPos = movePlayer(aiPos, aiDice);
+                    status.textContent = `AI melempar ${aiDice}, posisi sekarang: ${aiPos}`;
+                    if (aiPos === 100) {
+                        status.textContent = 'AI menang!';
+                        rollBtn.disabled = true;
+                        return;
+                    }
+                    currentPlayer = 'player';
+                }, 1000);
+            }
+            drawBoard();
+        });
+
+        // Inisialisasi
+        drawBoard();
+    </script>
+</body>
+</html>
