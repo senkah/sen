@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ular Tangga</title>
+  <style>
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(10, 50px);
+      gap: 5px;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      border: 1px solid black;
+      text-align: center;
+      line-height: 50px;
+    }
+    .player {
+      background-color: red;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ular Tangga</h1>
+  <div id="game-board">
+  </div>
+  <button id="roll-dice">Lempar Dadu</button>
+  <p id="player-position">Posisi Pemain: 1</p>
+
+  <
